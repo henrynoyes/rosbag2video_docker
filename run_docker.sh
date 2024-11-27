@@ -18,6 +18,6 @@ else
   docker run --rm -it --name ${CONTAINER_NAME} \
              -v ${HOST_BASE_PATH}/data:${CONTAINER_BASE_PATH}/data \
              -v ${HOST_BASE_PATH}/rosbags_video.py:${CONTAINER_BASE_PATH}/rosbags_video.py \
-             -v /media:/media \
+             -v /media:/media:ro \
              ${IMAGE_NAME} /bin/bash
 fi

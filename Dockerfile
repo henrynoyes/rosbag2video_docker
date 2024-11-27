@@ -14,7 +14,7 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-RUN pip install rosbags opencv-python
+RUN pip install rosbags opencv-python tqdm
     
 WORKDIR /home/humble
 

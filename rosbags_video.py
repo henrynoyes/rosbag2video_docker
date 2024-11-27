@@ -1,6 +1,7 @@
 from pathlib import Path
 import cv2
 import argparse
+from tqdm import tqdm
 from rosbags.highlevel import AnyReader
 from rosbags.typesys import Stores, get_typestore
 from cv_bridge import CvBridge
@@ -33,14 +34,23 @@ class VideoConverter:
             if usrin == 'n':
                 print('Avoiding overwrite. Exiting...')
                 exit(0)
-
-        print(f'Writing to {output_path}')
                 
     def cv2_convert(self, msg, ts):
 
+        encodings = {
+            'rgb8': 'bgr8',
+            'bgr8': 'bgr8',
+            # '16UC1': '16UC1',
+            # '32FC1': '32FC1'
+        }
+
         try:
-            img = self.bridge.imgmsg_to_cv2(msg, desired_encoding='bgr8')
-            return img
+            if msg.encoding in encodings:
+                img = self.bridge.imgmsg_to_cv2(msg, desired_encoding=encodings[msg.encoding])
+                return img
+            else:
+                print(f'Unsupported image encoding: {msg.encoding}. Exiting...')
+                exit(1)
         
         except Exception as e:
             print(f'Error converting image at {ts}: {e}')
@@ -54,14 +64,19 @@ class VideoConverter:
         with AnyReader([Path(bag_path)], default_typestore=self.typestore) as reader:
             connections = [x for x in reader.connections if x.topic == topic]
 
-            for connection, timestamp, rawdata in reader.messages(connections=connections):
-                msg = reader.deserialize(rawdata, connection.msgtype)
-                img = self.cv2_convert(msg, timestamp)
+            print(f'Reading {bag_path} ...')
+            msg_count = sum(1 for _ in reader.messages(connections=connections))
+            with tqdm(total=msg_count, desc='Processing', unit='frames') as pbar:
+                for connection, timestamp, rawdata in reader.messages(connections=connections):
+                    msg = reader.deserialize(rawdata, connection.msgtype)
+                    img = self.cv2_convert(msg, timestamp)
 
-                if img is not None:
-                    video_writer.write(img)
+                    if img is not None:
+                        video_writer.write(img)
+                    pbar.update(1)
 
         video_writer.release()
+        print(f'Success! Video saved to {output_path}')
 
 if __name__ == '__main__':
 
