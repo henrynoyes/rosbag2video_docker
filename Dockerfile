@@ -8,13 +8,14 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
     python3-sensor-msgs \
     python3-opencv \
     python3-setuptools \
+    ros-humble-vision-opencv \
+    ros-humble-rosbag2-transport \
+    ros-humble-rosbag2-storage-mcap \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
+
+RUN pip install rosbags opencv-python
     
 WORKDIR /home/humble
-
-RUN git clone https://github.com/mlaiacker/rosbag2video.git
-
-RUN chmod +x ./rosbag2video/ros2bag2video.py
 
 CMD ["bash", "-c", "source /opt/ros/humble/setup.bash"]

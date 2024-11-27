@@ -7,8 +7,8 @@ IMAGE_NAME="rosbag2video:humble"
 CONTAINER_NAME="rosbag2video"
 
 # Path to the directory you want to mount inside the container
-HOST_DIRECTORY_PATH="$(pwd)/data"
-CONTAINER_DIRECTORY_PATH="/home/humble/data"
+HOST_BASE_PATH="$(pwd)"
+CONTAINER_BASE_PATH="/home/humble"
 
 # Check if the container is already running
 if [ $(docker ps -q -f name=${CONTAINER_NAME}) ]; then
@@ -16,6 +16,8 @@ if [ $(docker ps -q -f name=${CONTAINER_NAME}) ]; then
 else
   # Run the container
   docker run --rm -it --name ${CONTAINER_NAME} \
-             -v ${HOST_DIRECTORY_PATH}:${CONTAINER_DIRECTORY_PATH} \
+             -v ${HOST_BASE_PATH}/data:${CONTAINER_BASE_PATH}/data \
+             -v ${HOST_BASE_PATH}/rosbags_video.py:${CONTAINER_BASE_PATH}/rosbags_video.py \
+             -v /media:/media \
              ${IMAGE_NAME} /bin/bash
 fi

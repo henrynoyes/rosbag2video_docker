@@ -6,6 +6,8 @@
 
 `./run_docker.sh`
 
-`./ros2bag2video.py [--fps 25] [--rate 1.0] [-o outputfile] [-v] [-s] [-t topic] data/bagname`
+`python3 rosbags_video.py [-h] [-t TOPIC] [-o OUTPUT_PATH] [--fps FPS] [--width WIDTH] [--height HEIGHT] data/bagname`
 
 ### store bags in data/ so they are accessible in container
+
+### also mounts /media for data on external drives
